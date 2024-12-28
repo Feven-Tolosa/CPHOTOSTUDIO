@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin</title>
+  </head>
+  <body>
+    <h1>Add photos</h1>
+    <form action="http://localhost:5555/addphotos" method="post">
+      <label for="imgPath">Photo Image Path:</label><br />
+      <input type="text" name="imgPath" /><br /><br />
+      <label for="photoTitle">Photo Title:</label><br />
+      <input type="text" name="photoTitle" /><br /><br />
+      <label for="briefDescription">Brief Description:</label><br />
+      <textarea name="briefDescription" cols="30" rows="10"></textarea
+      ><br /><br />
+      <input type="submit" value="Photo Shot" />
+    </form>
+  </body>
+</html>
