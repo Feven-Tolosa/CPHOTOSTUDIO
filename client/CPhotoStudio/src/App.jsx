@@ -16,8 +16,8 @@ function App() {
       <Carousel />
       <About />
       <Services />
-      {/* <Gallery />
-      <Blogs />
+      <Gallery />
+      {/* <Blogs />
       <Testimony />
       <Book />
       <Follow /> */}
