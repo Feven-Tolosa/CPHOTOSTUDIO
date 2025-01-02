@@ -1,6 +1,5 @@
 import React from "react";
 import ServiceSection from "./ServiceSection";
-import img1 from "../../../public/image/bg-img/21.jpg";
 
 const Services = () => {
   const services = [
@@ -28,10 +27,10 @@ const Services = () => {
   ];
 
   return (
-    <section className="services p-5">
-      <h2 className="text-3xl font-bold text-center mb-5 text-black">
+    <section className="services p-5 bg-customGreen">
+      <h1 className="text-4xl font-bold text-center mb-5 text-white pb-12">
         Services
-      </h2>
+      </h1>
       {services.map((service, index) => (
         <ServiceSection
           key={index}

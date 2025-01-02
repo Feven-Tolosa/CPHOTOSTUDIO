@@ -1,10 +1,35 @@
+const fs = require("fs");
 const express = require("express");
+const cors = require("cors");
+const multer = require("multer");
+const path = require("path");
 const app = express();
 const mysql = require("mysql2");
 
 // Use built-in middleware to parse JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Create the uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
+
+// Enable CORS
+app.use(cors());
+
+// Multer configuration for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // Add timestamp to filename
+  },
+});
+
+const upload = multer({ storage: storage });
 
 app.get("/", (req, res) => res.send("up and running..."));
 
@@ -21,13 +46,13 @@ connection.connect((err) => {
 });
 
 app.get("/install", (req, res) => {
-  let createPhotos = `CREATE TABLE IF NOT EXISTS photos (
+  const createPhotos = `CREATE TABLE IF NOT EXISTS photos (
     photo_id INT AUTO_INCREMENT,
     photo_url VARCHAR(255) NOT NULL,
     PRIMARY KEY (photo_id)
   )`;
 
-  let createDescriptions = `CREATE TABLE IF NOT EXISTS descriptions (
+  const createDescriptions = `CREATE TABLE IF NOT EXISTS descriptions (
     description_id INT AUTO_INCREMENT,
     photo_id INT,
     title VARCHAR(255) NOT NULL,
@@ -36,13 +61,13 @@ app.get("/install", (req, res) => {
     FOREIGN KEY (photo_id) REFERENCES photos(photo_id)
   )`;
 
-  let createCategories = `CREATE TABLE IF NOT EXISTS categories (
+  const createCategories = `CREATE TABLE IF NOT EXISTS categories (
     category_id INT AUTO_INCREMENT,
     category_name VARCHAR(255) NOT NULL,
     PRIMARY KEY (category_id)
   )`;
 
-  let createPhotoCategories = `CREATE TABLE IF NOT EXISTS photo_categories (
+  const createPhotoCategories = `CREATE TABLE IF NOT EXISTS photo_categories (
     photo_id INT,
     category_id INT,
     PRIMARY KEY (photo_id, category_id),
@@ -50,140 +75,145 @@ app.get("/install", (req, res) => {
     FOREIGN KEY (category_id) REFERENCES categories(category_id)
   )`;
 
-  connection.query(createPhotos, (err, results, fields) => {
+  const createTestimonials = `CREATE TABLE IF NOT EXISTS testimonials (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  img_url VARCHAR(255) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  position VARCHAR(255),
+  text TEXT NOT NULL
+);
+`;
+
+  connection.query(createPhotos, (err) => {
     if (err) console.log(err);
     else console.log("Photos table created successfully");
   });
 
-  connection.query(createDescriptions, (err, results, fields) => {
+  connection.query(createDescriptions, (err) => {
     if (err) console.log(err);
     else console.log("Descriptions table created successfully");
   });
 
-  connection.query(createCategories, (err, results, fields) => {
+  connection.query(createCategories, (err) => {
     if (err) console.log(err);
     else console.log("Categories table created successfully");
   });
 
-  connection.query(createPhotoCategories, (err, results, fields) => {
+  connection.query(createPhotoCategories, (err) => {
     if (err) console.log(err);
     else console.log("Photo Categories table created successfully");
+  });
+  connection.query(createTestimonials, (err) => {
+    if (err) console.log(err);
+    else console.log("Categories table created successfully");
   });
 
   res.end("Tables are created");
   console.log("Tables are created");
 });
 
-app.post("/addphotos", (req, res) => {
-  console.log(req.body);
-  let imgPath = req.body.imgPath;
-  let photoTitle = req.body.photoTitle;
-  let briefDescription = req.body.briefDescription;
-  let categoryName = req.body.categoryName;
+// Route to upload images
+app.post("/upload", upload.single("image"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send("No file uploaded.");
+  }
+  const imageUrl = `http://localhost:5555/uploads/${req.file.filename}`;
+
+  // Save imageUrl and other details to the database
+  const { photoTitle, briefDescription, categoryName } = req.body;
 
   // Insert into the photos table
-  let insertPhotoQuery = `INSERT INTO photos (photo_url) VALUES (?)`;
+  const insertPhotoQuery = `INSERT INTO photos (photo_url) VALUES (?)`;
 
-  connection.query(insertPhotoQuery, [imgPath], (err, results, fields) => {
+  connection.query(insertPhotoQuery, [imageUrl], (err, results) => {
     if (err) {
       console.log(err);
-      res.status(500).send("Error inserting photo URL");
-    } else {
-      let photoId = results.insertId;
+      return res.status(500).send("Error inserting photo URL");
+    }
+    const photoId = results.insertId;
 
-      // Insert into the descriptions table
-      let insertDescriptionQuery = `INSERT INTO descriptions (photo_id, title, description) VALUES (?, ?, ?)`;
+    // Insert into the descriptions table
+    const insertDescriptionQuery = `INSERT INTO descriptions (photo_id, title, description) VALUES (?, ?, ?)`;
 
-      connection.query(
-        insertDescriptionQuery,
-        [photoId, photoTitle, briefDescription],
-        (err, results, fields) => {
+    connection.query(
+      insertDescriptionQuery,
+      [photoId, photoTitle, briefDescription],
+      (err) => {
+        if (err) {
+          console.log(err);
+          return res.status(500).send("Error inserting description");
+        }
+
+        // Insert or find category
+        const findCategoryQuery = `SELECT category_id FROM categories WHERE category_name = ?`;
+
+        connection.query(findCategoryQuery, [categoryName], (err, results) => {
           if (err) {
             console.log(err);
-            res.status(500).send("Error inserting description");
-          } else {
-            console.log("Description inserted successfully");
+            return res.status(500).send("Error finding category");
+          }
+          if (results.length > 0) {
+            const categoryId = results[0].category_id;
 
-            // Insert or find category
-            let findCategoryQuery = `SELECT category_id FROM categories WHERE category_name = ?`;
+            // Insert into photo_categories table
+            const insertPhotoCategoryQuery = `INSERT INTO photo_categories (photo_id, category_id) VALUES (?, ?)`;
 
             connection.query(
-              findCategoryQuery,
-              [categoryName],
-              (err, results, fields) => {
+              insertPhotoCategoryQuery,
+              [photoId, categoryId],
+              (err) => {
                 if (err) {
                   console.log(err);
-                  res.status(500).send("Error finding category");
-                } else if (results.length > 0) {
-                  let categoryId = results[0].category_id;
-
-                  // Insert into photo_categories table
-                  let insertPhotoCategoryQuery = `INSERT INTO photo_categories (photo_id, category_id) VALUES (?, ?)`;
-
-                  connection.query(
-                    insertPhotoCategoryQuery,
-                    [photoId, categoryId],
-                    (err, results, fields) => {
-                      if (err) {
-                        console.log(err);
-                        res
-                          .status(500)
-                          .send("Error linking photo and category");
-                      } else {
-                        console.log("Data inserted successfully");
-                        res.status(200).send("Data inserted successfully");
-                      }
-                    }
-                  );
-                } else {
-                  // Category doesn't exist, insert it
-                  let insertCategoryQuery = `INSERT INTO categories (category_name) VALUES (?)`;
-
-                  connection.query(
-                    insertCategoryQuery,
-                    [categoryName],
-                    (err, results, fields) => {
-                      if (err) {
-                        console.log(err);
-                        res.status(500).send("Error inserting category");
-                      } else {
-                        let categoryId = results.insertId;
-
-                        // Insert into photo_categories table
-                        let insertPhotoCategoryQuery = `INSERT INTO photo_categories (photo_id, category_id) VALUES (?, ?)`;
-
-                        connection.query(
-                          insertPhotoCategoryQuery,
-                          [photoId, categoryId],
-                          (err, results, fields) => {
-                            if (err) {
-                              console.log(err);
-                              res
-                                .status(500)
-                                .send("Error linking photo and category");
-                            } else {
-                              console.log("Data inserted successfully");
-                              res
-                                .status(200)
-                                .send("Data inserted successfully");
-                            }
-                          }
-                        );
-                      }
-                    }
-                  );
+                  return res
+                    .status(500)
+                    .send("Error linking photo and category");
                 }
+                console.log("Data inserted successfully");
+                return res.status(200).send("Data inserted successfully");
+              }
+            );
+          } else {
+            // Category doesn't exist, insert it
+            const insertCategoryQuery = `INSERT INTO categories (category_name) VALUES (?)`;
+
+            connection.query(
+              insertCategoryQuery,
+              [categoryName],
+              (err, results) => {
+                if (err) {
+                  console.log(err);
+                  return res.status(500).send("Error inserting category");
+                }
+                const categoryId = results.insertId;
+
+                // Insert into photo_categories table
+                const insertPhotoCategoryQuery = `INSERT INTO photo_categories (photo_id, category_id) VALUES (?, ?)`;
+
+                connection.query(
+                  insertPhotoCategoryQuery,
+                  [photoId, categoryId],
+                  (err) => {
+                    if (err) {
+                      console.log(err);
+                      return res
+                        .status(500)
+                        .send("Error linking photo and category");
+                    }
+                    console.log("Data inserted successfully");
+                    return res.status(200).send("Data inserted successfully");
+                  }
+                );
               }
             );
           }
-        }
-      );
-    }
+        });
+      }
+    );
   });
 });
 
 app.get("/photos", (req, res) => {
-  let selectPhotosQuery = `
+  const selectPhotosQuery = `
     SELECT 
       p.photo_id, 
       p.photo_url, 
@@ -200,16 +230,162 @@ app.get("/photos", (req, res) => {
       categories c ON pc.category_id = c.category_id
   `;
 
-  connection.query(selectPhotosQuery, (err, results, fields) => {
+  connection.query(selectPhotosQuery, (err, results) => {
     if (err) {
       console.log(err);
       res.status(500).send("Error fetching data");
+    }
+    console.log("Fetched data:", results);
+    res.json(results);
+  });
+});
+
+// Route to add a testimonial
+app.post("/testimonials", (req, res) => {
+  const { name, position, text } = req.body;
+  const img_url = req.file ? `/uploads/${req.file.filename}` : null;
+
+  const insertTestimonialQuery = `INSERT INTO testimonials (img_url, name, position, text) VALUES (?, ?, ?, ?)`;
+
+  connection.query(
+    insertTestimonialQuery,
+    [img_url, name, position, text],
+    (err) => {
+      if (err) {
+        console.log(err);
+        res.status(500).send("Error adding testimonial");
+      } else {
+        res.send("Testimonial added successfully");
+      }
+    }
+  );
+});
+
+// Route to delete a testimonial by name
+app.delete("/testimonials/name/:name", (req, res) => {
+  const name = req.params.name;
+
+  const deleteTestimonialQuery = `DELETE FROM testimonials WHERE name = ?`;
+
+  connection.query(deleteTestimonialQuery, [name], (err) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send("Error deleting testimonial");
     } else {
-      console.log("Fetched data:", results);
+      res.send("Testimonial deleted successfully");
+    }
+  });
+});
+
+// Route to get testimonials
+app.get("/testimonials", (req, res) => {
+  const selectTestimonialsQuery = `SELECT * FROM testimonials`;
+
+  connection.query(selectTestimonialsQuery, (err, results) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send("Error fetching testimonials");
+    } else {
+      console.log("Fetched testimonials:", results);
       res.json(results);
     }
   });
 });
+
+// Route to delete a photo by title
+app.delete("/photos/title/:title", (req, res) => {
+  const photoTitle = req.params.title;
+
+  // Find the photo ID based on the title
+  const findPhotoIdQuery = `
+    SELECT photo_id 
+    FROM descriptions 
+    WHERE title = ?
+  `;
+
+  connection.query(findPhotoIdQuery, [photoTitle], (err, results) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).send("Error finding photo ID");
+    }
+
+    if (results.length === 0) {
+      return res.status(404).send("Photo not found");
+    }
+
+    const photoId = results[0].photo_id;
+
+    // Delete from the photo_categories table
+    const deletePhotoCategoriesQuery = `DELETE FROM photo_categories WHERE photo_id = ?`;
+
+    connection.query(deletePhotoCategoriesQuery, [photoId], (err) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).send("Error deleting from photo_categories");
+      }
+
+      // Delete from the descriptions table
+      const deleteDescriptionsQuery = `DELETE FROM descriptions WHERE photo_id = ?`;
+
+      connection.query(deleteDescriptionsQuery, [photoId], (err) => {
+        if (err) {
+          console.log(err);
+          return res.status(500).send("Error deleting from descriptions");
+        }
+
+        // Delete from the photos table
+        const deletePhotosQuery = `DELETE FROM photos WHERE photo_id = ?`;
+
+        connection.query(deletePhotosQuery, [photoId], (err) => {
+          if (err) {
+            console.log(err);
+            return res.status(500).send("Error deleting from photos");
+          }
+
+          console.log("Photo and related data deleted successfully");
+          res.status(200).send("Photo and related data deleted successfully");
+        });
+      });
+    });
+  });
+});
+
+// Route to get photos by category
+app.get("/photos/category/:categoryName", (req, res) => {
+  const categoryName = req.params.categoryName;
+
+  const selectPhotosQuery = `
+    SELECT 
+      p.photo_id,
+      p.photo_url,
+      d.title,
+      d.description,
+      c.category_name
+    FROM 
+      photos p
+    JOIN 
+      descriptions d ON p.photo_id = d.photo_id
+    JOIN 
+      photo_categories pc ON p.photo_id = pc.photo_id
+    JOIN 
+      categories c ON pc.category_id = c.category_id
+    WHERE 
+      c.category_name = ?
+  `;
+
+  connection.query(selectPhotosQuery, [categoryName], (err, results) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send("Error fetching data by category");
+    } else {
+      console.log("Fetched data by category:", results);
+      res.json(results);
+    }
+  });
+});
+
+// Serve static files from the "uploads" directory
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.listen(5555, () =>
   console.log("Listen and running on http://localhost:5555")

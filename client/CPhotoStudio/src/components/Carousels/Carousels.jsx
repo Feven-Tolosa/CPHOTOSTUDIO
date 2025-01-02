@@ -33,13 +33,13 @@ function Carousels() {
                 <div className="mt-10 hero-btn-group animate-bounceInDown delay-100">
                   <a
                     href="#about"
-                    className="inline-block bg-customOrange text-white font-bold py-2 px-4 rounded-full mb-3 mb-sm-0 mr-4 ml-6 hover:bg-black  transition duration-300"
+                    className="inline-block text-white font-bold py-2  mb-3 mb-sm-0 mr-4 ml-6 hover:bg-customOrange  transition duration-300 btn alime-btn border-2 border-customOrange rounded-full bg-transparent px-4 m-4"
                   >
                     About
                   </a>
                   <a
                     href="#book"
-                    className="inline-block bg-customOrange text-white font-bold py-2 px-4 rounded-full mb-3 mb-sm-0 mr-4 ml-6 hover:bg-black transition duration-300"
+                    className="inline-block text-white font-bold py-2  mb-3 mb-sm-0 mr-4 ml-6 hover:bg-customOrange  transition duration-300 btn alime-btn border-2 border-customOrange rounded-full bg-transparent px-4 m-4"
                   >
                     Book now
                   </a>
@@ -68,13 +68,13 @@ function Carousels() {
                 <div className="hero-btn-group animate-bounceInDown delay-100 mt-10">
                   <a
                     href="#about"
-                    className="inline-block bg-customOrange text-white font-bold py-2 px-4 rounded-full mb-3 mb-sm-0 mr-4 ml-6 hover:bg-black  transition duration-300"
+                    className="inline-block text-white font-bold py-2  mb-3 mb-sm-0 mr-4 ml-6 hover:bg-customOrange  transition duration-300 btn alime-btn border-2 border-customOrange rounded-full bg-transparent px-4 m-4"
                   >
                     About
                   </a>
                   <a
                     href="#book"
-                    className="inline-block bg-customOrange text-white font-bold py-2 px-4 rounded-full mb-3 mb-sm-0 mr-4 ml-6 hover:bg-black transition duration-300"
+                    className="inline-block text-white font-bold py-2  mb-3 mb-sm-0 mr-4 ml-6 hover:bg-customOrange  transition duration-300 btn alime-btn border-2 border-customOrange rounded-full bg-transparent px-4 m-4"
                   >
                     Book now
                   </a>
