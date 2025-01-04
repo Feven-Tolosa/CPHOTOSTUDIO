@@ -60,21 +60,24 @@ const Gallary = ({ maxImages = 9 }) => {
   }
 
   return (
-    <div className="bg-customGreen px-16">
+    <div className="bg-customGreen px-4 sm:px-8 md:px-16">
       <div className="text-center py-8">
         <h1 className="text-4xl font-bold text-white">Gallery</h1>
         <p className="text-white">Recent shots</p>
       </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 px-1">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:grid-rows-3 lg:grid-cols-3 lg:grid-rows-3">
         {images
           .slice(0, Math.min(maxImages, images.length))
           .map((image, index) => (
             <div
               key={index}
-              className={`${index === 0 ? "row-span-3" : ""} ${
-                index === 1 || index === 2 ? "col-span-2" : ""
-              } ${index === 3 ? "row-span-2 col-span-2" : ""}`}
+              className={`w-full ${
+                index === 0 ? "md:row-span-2 md:col-span-2" : ""
+              } ${
+                index === 1 || index === 2 ? "md:col-span-1 md:row-span-1" : ""
+              } ${index === 3 ? "md:row-span-2 md:col-span-1" : ""} ${
+                index === 4 || index === 5 ? "md:col-span-1 md:row-span-1" : ""
+              } ${index >= 6 ? "md:col-span-1 md:row-span-2" : ""}`}
             >
               <img
                 src={image}
@@ -85,7 +88,6 @@ const Gallary = ({ maxImages = 9 }) => {
             </div>
           ))}
       </div>
-
       {isSlideshowOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
           <button

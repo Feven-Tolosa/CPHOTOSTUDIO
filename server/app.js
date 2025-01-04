@@ -3,8 +3,9 @@ const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
-const app = express();
 const mysql = require("mysql2");
+
+const app = express();
 
 // Use built-in middleware to parse JSON and URL-encoded data
 app.use(express.json());
@@ -111,7 +112,6 @@ app.get("/install", (req, res) => {
   res.end("Tables are created");
   console.log("Tables are created");
 });
-
 // Route to upload images
 app.post("/upload", upload.single("image"), (req, res) => {
   if (!req.file) {
@@ -213,55 +213,49 @@ app.post("/upload", upload.single("image"), (req, res) => {
 });
 
 app.get("/photos", (req, res) => {
-  const selectPhotosQuery = `
-    SELECT 
-      p.photo_id, 
-      p.photo_url, 
-      d.title, 
-      d.description, 
-      c.category_name
-    FROM 
-      photos p
-    JOIN 
-      descriptions d ON p.photo_id = d.photo_id
-    JOIN 
-      photo_categories pc ON p.photo_id = pc.photo_id
-    JOIN 
-      categories c ON pc.category_id = c.category_id
-  `;
-
-  connection.query(selectPhotosQuery, (err, results) => {
+  const selectQuery = `
+        SELECT
+            photos.photo_url,
+            descriptions.title,
+            descriptions.description,
+            categories.category_name
+        FROM
+            photos
+        JOIN
+            descriptions ON photos.photo_id = descriptions.photo_id
+        JOIN
+            photo_categories ON photos.photo_id = photo_categories.photo_id
+        JOIN
+            categories ON photo_categories.category_id = categories.category_id;
+    `;
+  connection.query(selectQuery, (err, results) => {
     if (err) {
       console.log(err);
-      res.status(500).send("Error fetching data");
+      return res.status(500).send("Error fetching photos");
     }
-    console.log("Fetched data:", results);
     res.json(results);
   });
 });
 
-// Route to add a testimonial
-app.post("/testimonials", (req, res) => {
+// Route to add testimonials
+app.post("/testimonial", upload.single("image"), (req, res) => {
   const { name, position, text } = req.body;
-  const img_url = req.file ? `/uploads/${req.file.filename}` : null;
+  const img_url = req.file
+    ? `http://localhost:5555/uploads/${req.file.filename}`
+    : null;
 
-  const insertTestimonialQuery = `INSERT INTO testimonials (img_url, name, position, text) VALUES (?, ?, ?, ?)`;
+  const sql = `INSERT INTO testimonials (name, position, text, img_url) VALUES (?, ?, ?, ?)`;
+  const values = [name, position, text, img_url];
 
-  connection.query(
-    insertTestimonialQuery,
-    [img_url, name, position, text],
-    (err) => {
-      if (err) {
-        console.log(err);
-        res.status(500).send("Error adding testimonial");
-      } else {
-        res.send("Testimonial added successfully");
-      }
+  connection.query(sql, values, (err, result) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).send("Error adding testimonial");
     }
-  );
+    res.send("Testimonial added successfully");
+  });
 });
 
-// Route to delete a testimonial by name
 app.delete("/testimonials/name/:name", (req, res) => {
   const name = req.params.name;
 
@@ -350,41 +344,6 @@ app.delete("/photos/title/:title", (req, res) => {
   });
 });
 
-// Route to get photos by category
-app.get("/photos/category/:categoryName", (req, res) => {
-  const categoryName = req.params.categoryName;
-
-  const selectPhotosQuery = `
-    SELECT 
-      p.photo_id,
-      p.photo_url,
-      d.title,
-      d.description,
-      c.category_name
-    FROM 
-      photos p
-    JOIN 
-      descriptions d ON p.photo_id = d.photo_id
-    JOIN 
-      photo_categories pc ON p.photo_id = pc.photo_id
-    JOIN 
-      categories c ON pc.category_id = c.category_id
-    WHERE 
-      c.category_name = ?
-  `;
-
-  connection.query(selectPhotosQuery, [categoryName], (err, results) => {
-    if (err) {
-      console.log(err);
-      res.status(500).send("Error fetching data by category");
-    } else {
-      console.log("Fetched data by category:", results);
-      res.json(results);
-    }
-  });
-});
-
-// Serve static files from the "uploads" directory
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.listen(5555, () =>

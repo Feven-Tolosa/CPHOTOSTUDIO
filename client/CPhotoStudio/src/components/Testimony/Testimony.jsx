@@ -5,12 +5,21 @@ import "slick-carousel/slick/slick-theme.css";
 
 const Testimonial = () => {
   const [testimonials, setTestimonials] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetch("http://localhost:5555/testimonials")
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
       .then((data) => setTestimonials(data))
-      .catch((error) => console.error("Error fetching testimonials:", error));
+      .catch((error) => {
+        console.error("Error fetching testimonials:", error);
+        setError(error.message);
+      });
   }, []);
 
   const settings = {
@@ -32,61 +41,43 @@ const Testimonial = () => {
           <h4 className="text-xl mt-2">Our satisfied customer says</h4>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {testimonials.map((testimonial, index) => (
-            <div
-              key={index}
-              className="first-testimonial p-4 bg-white shadow-lg rounded-lg"
-            >
-              <div className="post-thumbnail mb-4 flex justify-center">
-                <img
-                  src={testimonial.img_url}
-                  alt=""
-                  className="w-24 h-24 rounded-full object-cover"
-                />
-              </div>
-              <p className="text-gray-600 mb-2 text-center">
-                {testimonial.text}
-              </p>
-              <h4 className="text-lg font-semibold text-center">
-                {testimonial.name}
-              </h4>
-              <span className="text-sm text-gray-500 text-center block">
-                {testimonial.position}
-              </span>
-            </div>
-          ))}
-        </div>
+        {error && (
+          <div className="text-center text-red-500 mb-4">Error: {error}</div>
+        )}
 
-        <div className="mt-8">
-          <Slider {...settings}>
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="item">
-                <div className="testimony-wrap p-4 pb-5 bg-white shadow-lg rounded-lg text-center">
-                  <div
-                    className="user-img mb-4 mx-auto w-24 h-24 rounded-full bg-cover bg-center"
-                    style={{ backgroundImage: `url(${testimonial.img_url})` }}
-                  >
-                    <span className="quote bg-customOrange text-white text-2xl p-2 rounded-full absolute top-0 left-0">
-                      <i className="icon-quote-left"></i>
-                    </span>
-                  </div>
-                  <div className="text">
-                    <p className="mb-2 pl-4 line text-gray-600">
-                      {testimonial.text}
-                    </p>
-                    <p className="name text-lg font-semibold">
-                      {testimonial.name}
-                    </p>
-                    <span className="position text-sm text-gray-500">
-                      {testimonial.position}
-                    </span>
-                  </div>
+        <Slider {...settings}>
+          {testimonials.map((testimonial) => (
+            <div key={testimonial.id} className="item">
+              <div className="testimony-wrap p-4 pb-5 bg-white shadow-lg rounded-lg text-center">
+                <div className="user-img mb-4 mx-auto w-24 h-24 rounded-full">
+                  <img
+                    src={testimonial.img_url}
+                    alt={testimonial.name}
+                    className="w-24 h-24 rounded-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "fallback-image-url"; // Replace with a fallback image URL
+                    }}
+                  />
+                  <span className="quote bg-customOrange text-white text-2xl p-2 rounded-full absolute top-0 left-0">
+                    <i className="icon-quote-left"></i>
+                  </span>
+                </div>
+                <div className="text">
+                  <p className="mb-2 pl-4 line text-gray-600">
+                    {testimonial.text}
+                  </p>
+                  <p className="name text-lg font-semibold">
+                    {testimonial.name}
+                  </p>
+                  <span className="position text-sm text-gray-500">
+                    {testimonial.position}
+                  </span>
                 </div>
               </div>
-            ))}
-          </Slider>
-        </div>
+            </div>
+          ))}
+        </Slider>
       </div>
     </section>
   );

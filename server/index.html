@@ -1,151 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin - Manage Photos and Testimonials</title>
-  <script defer src="testimonial.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100 p-4">
-  <div class="container mx-auto">
-    <div class="flex flex-col md:flex-row gap-4 mb-8">
-      <!-- Add Photo Section -->
-      <div class="md:w-2/3 bg-white shadow-md rounded px-8 pt-6 pb-8">
-        <h1 class="text-2xl font-bold mb-4">Add Photos</h1>
-        <form action="http://localhost:5555/upload" method="post" enctype="multipart/form-data">
-          <div class="mb-4">
-            <label for="image" class="block text-gray-700 text-sm font-bold mb-2">Photo Image:</label>
-            <input type="file" name="image" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-          </div>
-          <div class="mb-4">
-            <label for="photoTitle" class="block text-gray-700 text-sm font-bold mb-2">Photo Title:</label>
-            <input type="text" name="photoTitle" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-          </div>
-          <div class="mb-4">
-            <label for="briefDescription" class="block text-gray-700 text-sm font-bold mb-2">Brief Description:</label>
-            <textarea name="briefDescription" cols="30" rows="4" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required></textarea>
-          </div>
-          <div class="mb-4">
-            <label for="categoryName" class="block text-gray-700 text-sm font-bold mb-2">Category:</label>
-            <select name="categoryName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-              <option value="Women">Women</option>
-              <option value="Kids">Kids</option>
-              <option value="Families">Families</option>
-              <option value="Events">Events</option>
-              <option value="Nature">Nature</option>
-              <!-- Add more categories as needed -->
-            </select>
-          </div>
-          <div class="flex items-center justify-between">
-            <input type="submit" value="Add Photo" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-          </div>
-        </form>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Manage Photos and Testimonials</title>
+    <script defer src="testimonial.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100 p-4">
+    <div class="container mx-auto">
+      <div class="flex flex-col md:flex-row gap-4 mb-8">
+        <!-- Add Photo Section -->
+        <div class="md:w-2/3 bg-white shadow-md rounded px-8 pt-6 pb-8">
+          <h1 class="text-2xl font-bold mb-4">Add Photos</h1>
+          <form
+            action="http://localhost:5555/upload"
+            method="post"
+            enctype="multipart/form-data">
+            <div class="mb-4">
+              <label
+                for="image"
+                class="block text-gray-700 text-sm font-bold mb-2"
+                >Photo Image:</label
+              >
+              <input
+                type="file"
+                name="image"
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label
+                for="photoTitle"
+                class="block text-gray-700 text-sm font-bold mb-2"
+                >Photo Title:</label
+              >
+              <input
+                type="text"
+                name="photoTitle"
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label
+                for="briefDescription"
+                class="block text-gray-700 text-sm font-bold mb-2"
+                >Brief Description:</label
+              >
+              <textarea
+                name="briefDescription"
+                cols="30"
+                rows="4"
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                required
+              ></textarea>
+            </div>
+            <div class="mb-4">
+              <label
+                for="categoryName"
+                class="block text-gray-700 text-sm font-bold mb-2"
+                >Category:</input
+              >
+              <select
+                name="categoryName"
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                required
+              >
+                <option value="Women">Women</option>
+                <option value="Kids">Kids</option>
+                <option value="Families">Families</option>
+                <option value="Events">Events</option>
+                <option value="Nature">Nature</option>
+                <!-- Add more categories as needed -->
+              </select>
+            </div>
+            <div class="flex items-center justify-between">
+              <input
+                type="submit"
+                value="Add Photo"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              />
+            </div>
+          </form>
+        </div>
+
+        <!-- Delete Photo Section -->
+        <div class="md:w-1/3 bg-white shadow-md rounded px-8 pt-6 pb-8">
+          <h1 class="text-2xl font-bold mb-4">Delete Photo</h1>
+          <form
+            onsubmit="deletePhoto(event)"
+          >
+            <div class="mb-4">
+              <label
+                for="photoTitleToDelete"
+                class="block text-gray-700 text-sm font-bold mb-2"
+                >Photo Title to Delete:</label
+              >
+              <input
+                type="text"
+                name="photoTitleToDelete"
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                required
+              />
+            </div>
+            <div class="flex items-center justify-between">
+              <input
+                type="submit"
+                value="Delete Photo"
+                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              />
+            </div>
+          </form>
+        </div>
       </div>
 
-      <!-- Delete Photo Section -->
-      <div class="md:w-1/3 bg-white shadow-md rounded px-8 pt-6 pb-8">
-        <h1 class="text-2xl font-bold mb-4">Delete Photo</h1>
-        <form action="http://localhost:5555/photos/title" method="post" onsubmit="deletePhoto(event)">
-          <div class="mb-4">
-            <label for="photoTitleToDelete" class="block text-gray-700 text-sm font-bold mb-2">Photo Title to Delete:</label>
-            <input type="text" name="photoTitleToDelete" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-          </div>
-          <div class="flex items-center justify-between">
-            <input type="submit" value="Delete Photo" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-          </div>
-        </form>
+      <div class="flex flex-col md:flex-row gap-4">
+        <!-- Add Testimonial Section -->
+        <div class="md:w-2/3 bg-white shadow-md rounded px-8 pt-6 pb-8">
+          <h1 class="text-2xl font-bold mb-4">Add Testimonial</h1>
+          <form
+            id="testimonialForm"
+            action="http://localhost:5555/testimonial"
+            method="post"
+            enctype="multipart/form-data"
+          >
+            <div class="mb-4">
+              <label
+                for="testimonialImage"
+                class="block text-gray-700 text-sm font-bold mb-2"
+                >Photo Image:</label
+              >
+              <input
+                type="file"
+                name="image"
+                id="testimonialImage"
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label
+                for="name"
+                class="block text-gray-700 text-sm font-bold mb-2"
+                >Name:</label
+              >
+              <input
+                type="text"
+                name="name"
+                id="name"
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label
+                for="position"
+                class="block text-gray-700 text-sm font-bold mb-2"
+                >Position:</label
+              >
+              <input
+                type="text"
+                name="position"
+                id="position"
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              />
+            </div>
+            <div class="mb-4">
+              <label
+                for="text"
+                class="block text-gray-700 text-sm font-bold mb-2"
+                >Testimonial Text:</label
+              >
+              <textarea
+                name="text"
+                id="text"
+                cols="30"
+                rows="4"
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                required
+              ></textarea>
+            </div>
+            <div class="flex items-center justify-between">
+              <input
+                type="submit"
+                value="Add Testimonial"
+                class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              />
+            </div>
+          </form>
+        </div>
+
+        <!-- Delete Testimonial Section -->
+       <!-- Delete Testimonial Section -->
+<div class="md:w-1/3 bg-white shadow-md rounded px-8 pt-6 pb-8">
+  <h1 class="text-2xl font-bold mb-4">Delete Testimonial</h1>
+  <form id="deleteForm" onsubmit="deleteTestimonial(event)">
+    <div class="mb-4">
+      <label
+        for="nameToDelete"
+        class="block text-gray-700 text-sm font-bold mb-2"
+        >Name of Testimonial to Delete:</label
+      >
+      <input
+        type="text"
+        name="nameToDelete"
+        id="nameToDelete"
+        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+        required
+      />
+    </div>
+    <div class="flex items-center justify-between">
+      <input
+        type="submit"
+        value="Delete Testimonial"
+        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+      />
+    </div>
+  </form>
+</div>
+
       </div>
     </div>
 
-    <div class="flex flex-col md:flex-row gap-4">
-      <!-- Add Testimonial Section -->
-      <div class="md:w-2/3 bg-white shadow-md rounded px-8 pt-6 pb-8">
-        <h1 class="text-2xl font-bold mb-4">Add Testimonial</h1>
-        <form id="testimonialForm" enctype="multipart/form-data">
-          <div class="mb-4">
-            <label for="testimonialImage" class="block text-gray-700 text-sm font-bold mb-2">Photo Image:</label>
-            <input type="file" name="image" id="testimonialImage" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-          </div>
-          <div class="mb-4">
-            <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
-            <input type="text" name="name" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-          </div>
-          <div class="mb-4">
-            <label for="position" class="block text-gray-700 text-sm font-bold mb-2">Position:</label>
-            <input type="text" name="position" id="position" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-          </div>
-          <div class="mb-4">
-            <label for="text" class="block text-gray-700 text-sm font-bold mb-2">Testimonial Text:</label>
-            <textarea name="text" id="text" cols="30" rows="4" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required></textarea>
-          </div>
-          <div class="flex items-center justify-between">
-            <input type="submit" value="Add Testimonial" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-          </div>
-        </form>
-      </div>
+    <script>
+      async function deleteTestimonial(event) {
+  event.preventDefault();
+  const name = document.getElementById("nameToDelete").value;
 
-      <!-- Delete Testimonial Section -->
-      <div class="md:w-1/3 bg-white shadow-md rounded px-8 pt-6 pb-8">
-        <h1 class="text-2xl font-bold mb-4">Delete Testimonial</h1>
-        <form id="deleteForm" onsubmit="deleteTestimonial(event)">
-          <div class="mb-4">
-            <label for="nameToDelete" class="block text-gray-700 text-sm font-bold mb-2">Name of Testimonial to Delete:</label>
-            <input type="text" name="nameToDelete" id="nameToDelete" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-          </div>
-          <div class="flex items-center justify-between">
-            <input type="submit" value="Delete Testimonial" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    document.getElementById('testimonialForm').addEventListener('submit', async function(event) {
-      event.preventDefault();
-      const formData = new FormData(event.target);
-
-      try {
-        const response = await fetch('http://localhost:5555/testimonials', {
-          method: 'POST',
-          body: formData
-        });
-        const result = await response.text();
-        alert(result);
-        event.target.reset();
-      } catch (error) {
-        console.error('Error adding testimonial:', error);
-        alert('Error adding testimonial');
+  try {
+    const response = await fetch(
+      `http://localhost:5555/testimonials/name/${name}`,
+      {
+        method: "DELETE",
       }
-    });
+    );
+    const result = await response.text();
+    alert(result);
+  } catch (error) {
+    console.error("Error deleting testimonial:", error);
+    alert("Error deleting testimonial");
+  }
+}
 
-    async function deleteTestimonial(event) {
-      event.preventDefault();
-      const name = document.getElementById('nameToDelete').value;
+      async function deletePhoto(event) {
+  event.preventDefault();
+  const title = document.querySelector('input[name="photoTitleToDelete"]').value;
 
-      try {
-        const response = await fetch(`http://localhost:5555/testimonials/name/${name}`, {
-          method: 'DELETE',
-        });
-        const result = await response.text();
-        alert(result);
-      } catch (error) {
-        console.error('Error deleting testimonial:', error);
-        alert('Error deleting testimonial');
+  try {
+    const response = await fetch(
+      `http://localhost:5555/photos/title/${title}`,
+      {
+        method: "DELETE",
       }
-    }
-
-    async function deletePhoto(event) {
-      event.preventDefault();
-      const title = document.querySelector('input[name="photoTitleToDelete"]').value;
-
-      try {
-        const response = await fetch(`http://localhost:5555/photos/title/${title}`, {
-          method: 'DELETE',
-        });
-        const result = await response.text();
-        alert(result);
-      } catch (error) {
-        console.error('Error deleting photo:', error);
-      }}
+    );
+    const result = await response.text();
+    alert(result);
+  } catch (error) {
+    console.error("Error deleting photo:", error);
+    alert("Error deleting photo");
+  }
+}
+</script>
