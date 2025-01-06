@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import logo from "../../assets/image/core-img/logo.png";
 import menu from "../../assets/image/core-img/menu_white.png";
 import cMenu from "../../assets/image/core-img/close_menu.png";
+import { Link } from "react-router-dom";
 
-function Header() {
+function Header({ aboutRef, servicesRef, gallaryRef, testimonialRef }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -13,6 +14,11 @@ function Header() {
 
   const closeMenu = () => {
     setIsMenuOpen(false);
+  };
+
+  const scrollToSection = (ref) => {
+    ref.current.scrollIntoView({ behavior: "smooth" });
+    closeMenu();
   };
 
   useEffect(() => {
@@ -51,9 +57,9 @@ function Header() {
     >
       <div className="flex justify-between items-center">
         <div>
-          <a href="/">
+          <Link to="/">
             <img src={logo} alt="Logo" />
-          </a>
+          </Link>
         </div>
         <div className="block lg:hidden">
           <button
@@ -69,42 +75,36 @@ function Header() {
           </button>
         </div>
         <nav className="hidden lg:flex space-x-4 gap-10 pr-10">
-          <a
-            href="#"
-            className="text-white hover:text-customOrange hover:shadow-red-500"
-          >
-            Home
-          </a>
-          <a
-            href="#"
+          <button
+            onClick={() => scrollToSection(aboutRef)}
             className="text-white hover:text-customOrange hover:shadow-red-500"
           >
             About
-          </a>
-          <a
-            href="#"
+          </button>
+          <button
+            onClick={() => scrollToSection(servicesRef)}
+            className="text-white hover:text-customOrange hover:shadow-red-500"
+          >
+            Services
+          </button>
+          <button
+            onClick={() => scrollToSection(gallaryRef)}
             className="text-white hover:text-customOrange hover:shadow-red-500"
           >
             Gallery
-          </a>
-          <a
-            href="#"
+          </button>
+          <button
+            onClick={() => scrollToSection(testimonialRef)}
             className="text-white hover:text-customOrange hover:shadow-red-500"
           >
-            Blogs
-          </a>
-          <a
-            href="#"
+            Testimonial
+          </button>
+          <Link
+            to="/book"
             className="text-white hover:text-customOrange hover:shadow-red-500"
           >
             Book
-          </a>
-          <a
-            href="#"
-            className="text-white hover:text-customOrange hover:shadow-red-500"
-          >
-            Contact
-          </a>
+          </Link>
         </nav>
       </div>
       <div
@@ -114,47 +114,49 @@ function Header() {
       >
         <ul className="px-4 py-20 space-y-4">
           <li>
-            <a
-              href="#"
-              onClick={closeMenu}
-              className=" hover:text-customOrange"
-            >
-              Home
-            </a>
-          </li>
-          <hr />
-          <li>
-            <a
-              href="#"
-              onClick={closeMenu}
-              className=" hover:text-customOrange"
+            <button
+              onClick={() => scrollToSection(aboutRef)}
+              className="hover:text-customOrange"
             >
               About
-            </a>
+            </button>
           </li>
           <hr />
           <li>
-            <a href="#" onClick={closeMenu} className="hover:text-customOrange">
+            <button
+              onClick={() => scrollToSection(servicesRef)}
+              className="hover:text-customOrange"
+            >
+              Services
+            </button>
+          </li>
+          <hr />
+          <li>
+            <button
+              onClick={() => scrollToSection(gallaryRef)}
+              className="hover:text-customOrange"
+            >
               Gallery
-            </a>
+            </button>
           </li>
           <hr />
           <li>
-            <a href="#" onClick={closeMenu} className="hover:text-customOrange">
-              Blogs
-            </a>
+            <button
+              onClick={() => scrollToSection(testimonialRef)}
+              className="hover:text-customOrange"
+            >
+              Testimonial
+            </button>
           </li>
           <hr />
           <li>
-            <a href="#" onClick={closeMenu} className="hover:text-customOrange">
+            <Link
+              to="/book"
+              onClick={closeMenu}
+              className="hover:text-customOrange"
+            >
               Book
-            </a>
-          </li>
-          <hr />
-          <li>
-            <a href="#" onClick={closeMenu} className="hover:text-customOrange">
-              Contact
-            </a>
+            </Link>
           </li>
           <hr />
         </ul>

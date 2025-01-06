@@ -1,26 +1,43 @@
-import React from "react";
-import Header from "./components/Header/Header";
-// import "./assets/css/style.css";
-import Carousel from "./components/Carousels/Carousels";
-import About from "./components/About/About";
-import Services from "./components/Services/Services";
-import Gallary from "./components/Gallery/Gallary";
-import Testimonial from "./components/Testimony/Testimony";
-import Book from "./components/Book/Book";
-import Follow from "./components/Follow/Follow";
-function App() {
+import React, { useRef } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Home from "./Page/Home/Home";
+import BookingForm from "./Page/BookingForm/BookingForm";
+import Layout from "./components/Layout/Layout";
+
+const App = () => {
+  const aboutRef = useRef(null);
+  const servicesRef = useRef(null);
+  const gallaryRef = useRef(null);
+  const testimonialRef = useRef(null);
+
   return (
-    <div>
-      <Header />
-      <Carousel />
-      <About />
-      <Services />
-      <Gallary />
-      <Testimonial />
-      {/* <Book />
-      <Follow /> */}
-    </div>
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Layout
+              aboutRef={aboutRef}
+              servicesRef={servicesRef}
+              gallaryRef={gallaryRef}
+              testimonialRef={testimonialRef}
+            >
+              <Home />
+            </Layout>
+          }
+        />
+        <Route
+          path="/book"
+          element={
+            <Layout>
+              <BookingForm />
+            </Layout>
+          }
+        />
+        {/* Add more routes as needed */}
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;

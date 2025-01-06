@@ -223,9 +223,86 @@
     </div>
   </form>
 </div>
-
       </div>
+
+      <div class="flex flex-col md:flex-row gap-4 mt-8"> 
+        <!-- Add Photographer Section -->
+<div class="md:w-2/3 bg-white shadow-md rounded px-8 pt-6 pb-8">
+  <h1 class="text-2xl font-bold mb-4">Add Photographer</h1>
+  <form onsubmit="addPhotographer(event)">
+    <div class="mb-4">
+      <label for="photographerName" class="block text-gray-700 text-sm font-bold mb-2">Photographer Name:</label>
+      <input type="text" name="photographerName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
     </div>
+    <div class="mb-4">
+      <label for="photographerEmail" class="block text-gray-700 text-sm font-bold mb-2">Photographer Email:</label>
+      <input type="email" name="photographerEmail" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required />
+    </div>
+    <div class="flex items-center justify-between">
+      <input type="submit" value="Add Photographer" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" />
+    </div>
+  </form>
+</div>
+
+
+          <!-- Delete Photographer Section --> 
+           <div class="md:w-1/3 bg-white shadow-md rounded px-8 pt-6 pb-8"> 
+            <h1 class="text-2xl font-bold mb-4">Delete Photographer</h1> 
+            <form onsubmit="deletePhotographer(event)"> 
+              <div class="mb-4"> 
+                <label for="photographerNameToDelete" class="block text-gray-700 text-sm font-bold mb-2" >
+                  Photographer Name to Delete:
+                </label > 
+                <input type="text" name="photographerNameToDelete" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required /> 
+              </div> 
+              <div class="flex items-center justify-between"> 
+                <input type="submit" value="Delete Photographer" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" /> 
+              </div> 
+            </form> 
+          </div> 
+        </div>
+
+    <!-- Add Photographer Availability Section -->
+<div class="flex flex-col md:flex-row gap-4 mt-8"> 
+  <!-- Set Photographer Availability Section --> 
+   <div class="md:w-2/3 bg-white shadow-md rounded px-8 pt-6 pb-8"> 
+    <h1 class="text-2xl font-bold mb-4">
+    Set Photographer Availability
+  </h1> 
+  <form onsubmit="setAvailability(event)"> 
+    <div class="mb-4"> 
+      <label for="photographerId" class="block text-gray-700 text-sm font-bold mb-2">
+        Photographer:
+      </label> 
+      <select name="photographerId" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required> 
+        <!-- Options populated by JavaScript --> 
+        </select> 
+      </div> 
+      <div class="mb-4"> 
+        <label for="availableDate" class="block text-gray-700 text-sm font-bold mb-2">
+          Date:
+        </label> 
+        <input type="date" name="availableDate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required /> 
+      </div>
+       <div class="mb-4"> 
+        <label for="startTime" class="block text-gray-700 text-sm font-bold mb-2">
+          Start Time:
+        </label> 
+        <input type="time" name="startTime" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required /> 
+      </div> 
+      <div class="mb-4"> 
+        <label for="endTime" class="block text-gray-700 text-sm font-bold mb-2">
+          End Time:
+        </label> 
+        <input type="time" name="endTime" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required /> 
+      </div> 
+      <div class="flex items-center justify-between"> 
+        <input type="submit" value="Set Availability" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" /> 
+      </div> 
+    </form> 
+  </div> 
+</div>
+</div>
 
     <script>
       async function deleteTestimonial(event) {
@@ -265,4 +342,53 @@
     alert("Error deleting photo");
   }
 }
+ 
+  async function addPhotographer(event) {
+    event.preventDefault();
+    const name = document.querySelector('input[name="photographerName"]').value;
+    const email = document.querySelector('input[name="photographerEmail"]').value;
+
+    try {
+      const response = await fetch("http://localhost:5555/photographers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email }),
+      });
+      const result = await response.text();
+      alert(result);
+    } catch (error) {
+      console.error("Error adding photographer:", error);
+      alert("Error adding photographer");
+    }
+  }
+
+async function deletePhotographer(event) { event.preventDefault(); 
+  const name = document.querySelector('input[name="photographerNameToDelete"]').value;
+ try { const response = await fetch( `http://localhost:5555/photographers/name/${name}`, { method: "DELETE", } ); 
+ const result = await response.text(); 
+ alert(result); } catch (error) {
+   console.error("Error deleting photographer:", error);
+  alert("Error deleting photographer"); } }
+  
+async function setAvailability(event) { 
+event.preventDefault();
+const photographerId = document.querySelector('select[name="photographerId"]').value; 
+const availableDate = document.querySelector('input[name="availableDate"]').value; 
+const startTime = document.querySelector('input[name="startTime"]').value; 
+const endTime = document.querySelector('input[name="endTime"]').value; 
+try { const response = await fetch("http://localhost:5555/availability", { method: "POST", headers: { "Content-Type": "application/json", }, body: JSON.stringify({ photographer_id: photographerId, available_date: availableDate, start_time: startTime, end_time: endTime, }), }); 
+const result = await response.text(); alert(result); 
+} catch (error) { console.error("Error setting availability:", error); alert("Error setting availability"); } } 
+async function fetchPhotographers() { try { 
+  const response = await fetch("http://localhost:5555/photographers"); 
+  const photographers = await response.json(); 
+  const photographerSelect = document.querySelector('select[name="photographerId"]'); 
+  photographers.forEach((photographer) => { const option = document.createElement("option"); 
+  option.value = photographer.photographer_id; 
+  option.textContent = photographer.name; photographerSelect.appendChild(option); }); 
+  } catch (error) { console.error("Error fetching photographers:", error); 
+  alert("Error fetching photographers"); } } 
+  document.addEventListener("DOMContentLoaded", fetchPhotographers);
 </script>
