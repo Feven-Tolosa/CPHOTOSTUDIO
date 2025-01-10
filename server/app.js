@@ -4,6 +4,7 @@ const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
 const mysql = require("mysql2");
+const nodemailer = require("nodemailer");
 
 const app = express();
 
@@ -461,9 +462,6 @@ app.get("/available-slots", (req, res) => {
   });
 });
 
-const nodemailer = require("nodemailer");
-
-// Configure Nodemailer transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -472,7 +470,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Fetch the photographer's email address
 const getPhotographerEmail = (photographerId) => {
   return new Promise((resolve, reject) => {
     const query = "SELECT email FROM photographers WHERE photographer_id = ?";
@@ -489,7 +486,6 @@ const getPhotographerEmail = (photographerId) => {
   });
 };
 
-// Book a slot and send notification
 app.post("/book", async (req, res) => {
   const {
     photographer_id,
@@ -499,6 +495,7 @@ app.post("/book", async (req, res) => {
     start_time,
     end_time,
   } = req.body;
+
   const query = `INSERT INTO bookings (photographer_id, client_name, client_email, booking_date, start_time, end_time)
                  VALUES (?, ?, ?, ?, ?, ?)`;
 
@@ -522,18 +519,16 @@ app.post("/book", async (req, res) => {
         const photographerEmail = await getPhotographerEmail(photographer_id);
         console.log("Photographer email:", photographerEmail);
 
-        // Send email notification to the photographer
         const mailOptions = {
-          from: "your-email@gmail.com",
+          from: "mercytolosa3@gmail.com",
           to: photographerEmail,
           subject: "New Booking Notification",
-          text: `Dear Photographer,\n\nYou have a new booking from ${client_name} (${client_email}) on ${booking_date} from ${start_time} to ${end_time}.\n\nBest regards,\nYour Photo Studio`,
+          html: `<p>Dear Photographer,</p><p>You have a new booking from ${client_name} (${client_email}) on ${booking_date} from ${start_time} to ${end_time}.</p><p>Best regards,</p><p>Your Photo Studio</p>`,
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
           if (error) {
             console.error("Error sending email:", error);
-            // Capture and log more detailed error information
             console.error("Error details:", error.response);
             return res
               .status(500)
