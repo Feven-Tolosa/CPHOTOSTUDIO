@@ -8,7 +8,7 @@ const Testimonial = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5555/testimonials")
+    fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/testimonials`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

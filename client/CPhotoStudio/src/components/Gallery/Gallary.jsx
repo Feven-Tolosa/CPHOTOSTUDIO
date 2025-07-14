@@ -11,7 +11,7 @@ const Gallary = ({ maxImages = 9 }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5555/photos")
+    fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/photos`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

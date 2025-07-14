@@ -17,7 +17,7 @@ const BookingForm = () => {
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:5555/photographers")
+    fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/photographers`)
       .then((response) => response.json())
       .then((data) => setPhotographers(data))
       .catch((error) => console.error("Error fetching photographers:", error));
@@ -25,7 +25,11 @@ const BookingForm = () => {
 
   const fetchAvailableSlots = () => {
     fetch(
-      `http://localhost:5555/available-slots?photographer_id=${selectedPhotographer}&date=${bookingDetails.booking_date}`
+      `${
+        import.meta.env.VITE_REACT_APP_BACKEND_BASEURL
+      }/available-slots?photographer_id=${selectedPhotographer}&date=${
+        bookingDetails.booking_date
+      }`
     )
       .then((response) => response.json())
       .then((data) => {
@@ -51,7 +55,7 @@ const BookingForm = () => {
     // Add debugging logs
     console.log("Sending booking request to server...");
 
-    fetch("http://localhost:5555/book", {
+    fetch(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/book`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

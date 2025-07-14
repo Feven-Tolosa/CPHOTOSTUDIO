@@ -117,7 +117,7 @@ app.post("/upload", upload.single("image"), (req, res) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
-  const imageUrl = `http://localhost:5555/uploads/${req.file.filename}`;
+  const imageUrl = ``${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/uploads/${req.file.filename}`;
 
   // Save imageUrl and other details to the database
   const { photoTitle, briefDescription, categoryName } = req.body;
@@ -241,7 +241,7 @@ app.get("/photos", (req, res) => {
 app.post("/testimonial", upload.single("image"), (req, res) => {
   const { name, position, text } = req.body;
   const img_url = req.file
-    ? `http://localhost:5555/uploads/${req.file.filename}`
+    ? ``${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/uploads/${req.file.filename}`
     : null;
 
   const sql = `INSERT INTO testimonials (name, position, text, img_url) VALUES (?, ?, ?, ?)`;
@@ -347,5 +347,5 @@ app.delete("/photos/title/:title", (req, res) => {
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.listen(5555, () =>
-  console.log("Listen and running on http://localhost:5555")
+  console.log("Listen and running on `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}")
 );
