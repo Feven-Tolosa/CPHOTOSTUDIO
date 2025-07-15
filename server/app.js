@@ -5,7 +5,7 @@ const multer = require('multer')
 const path = require('path')
 const mysql = require('mysql2')
 const nodemailer = require('nodemailer')
-
+require('dotenv').config()
 const app = express()
 
 // Use built-in middleware to parse JSON and URL-encoded data
@@ -36,10 +36,10 @@ const upload = multer({ storage: storage })
 app.get('/', (req, res) => res.send('up and running...'))
 
 const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'CPhotoStudio',
-  password: 'TAFNEM@1432',
-  database: 'cphotostudio',
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 })
 
 connection.connect((err) => {
@@ -546,11 +546,11 @@ app.post('/book', async (req, res) => {
     }
   )
 })
-
+console.log(`Server running on ${process.env.VITE_REACT_APP_BACKEND_BASEURL}`)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 app.listen(5555, () =>
   console.log(
-    'Listen and running on `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}`'
+    'Listen and running on `${process.env.VITE_REACT_APP_BACKEND_BASEURL}`'
   )
 )
